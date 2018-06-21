@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 
-import java.io.IOException;
 import java.util.List;
 
 import static com.codeborne.selenide.Selenide.*;
@@ -81,7 +80,20 @@ public class TestCases {
     }
 
     @Test
-    public void testCase2() throws IOException {
+    public void TestCase2() {
+        Response response = given().when().
+                get("https://api.github.com/search/repositories?q=selenide&sort=stars");
+        assertEquals(200, response.getStatusCode());
+        System.out.println(response.getStatusCode());
+        SetUP();
+        $(By.name("q")).setValue("Selenid").pressEnter();
+        $(".select-menu.select-menu-modal-right").click();
+        $(".select-menu-item", 1).click();
+        sleep(5000);
+    }
+
+    @Test
+    public void testCase3() {
         String username = "KraaS1";
         String pass = "6233199717i";
         String repName = "testRepository";
@@ -100,13 +112,14 @@ public class TestCases {
         SetUP();
         open(BASE_URL + "/login");
         login(username, pass);
-        sleep(3000);
-        $("#dashboard-repos-filter").val(username + "/" + repName);
-        $(".list-style-none .width-full").click();
+        open(BASE_URL + "/" + username + "?tab=repositories");
+        $("#your-repos-filter").val(username + "/" + repName).pressEnter();
+        $("#user-repositories-list .mb-1").click();
         $(".reponav .octicon-gear").click();
         $(".btn-danger", 4).click();
         $(".input-block", 1).val(repName).pressEnter();
-
-         sleep(5000);
+        Response comparison = given().when().get("https://api.github.com/repos/"+username+"/"+repName);
+        assertEquals(404, comparison.getStatusCode());
+        sleep(3000);
     }
 }
