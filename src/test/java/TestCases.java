@@ -16,7 +16,6 @@ import static org.junit.Assert.assertEquals;
 
 
 public class TestCases {
-    private static final String BASE_URL_API = "https://api.github.com/search/repositories";
     private static final String BASE_URL = "https://github.com/";
 
     private static void login(String l, String p) {
@@ -118,7 +117,7 @@ public class TestCases {
         $(".reponav .octicon-gear").click();
         $(".btn-danger", 4).click();
         $(".input-block", 1).val(repName).pressEnter();
-        Response comparison = given().when().get("https://api.github.com/repos/"+username+"/"+repName);
+        Response comparison = given().when().get("https://api.github.com/repos/" + username + "/" + repName);
         assertEquals(404, comparison.getStatusCode());
         sleep(3000);
     }
