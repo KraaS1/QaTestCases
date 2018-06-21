@@ -7,10 +7,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 
+import java.io.IOException;
 import java.util.List;
 
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.open;
+import static com.codeborne.selenide.Selenide.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
 import static org.junit.Assert.assertEquals;
@@ -20,12 +20,18 @@ public class TestCases {
     private static final String BASE_URL_API = "https://api.github.com/search/repositories";
     private static final String BASE_URL = "https://github.com/";
 
+    private static void login(String l, String p) {
+        $("#login_field").val(l);
+        $("#password").val(p).pressEnter();
+    }
+
     @Before
     public void SetUP() {
         System.setProperty("webdriver.chrome.driver", "C:\\chromedriver.exe");
         Configuration.browser = "chrome";
         open(BASE_URL);
     }
+
 
     @Test
     public void testCase1() throws JSONException {
@@ -72,5 +78,35 @@ public class TestCases {
         JSONObject jsonResponse = new JSONObject(response.asString());
         String capital = jsonResponse.getString("total_count");
         Assert.assertEquals(capital, "527");
+    }
+
+    @Test
+    public void testCase2() throws IOException {
+        String username = "KraaS1";
+        String pass = "6233199717i";
+        String repName = "testRepository";
+        String json =
+                "{\n" +
+                        "  \"name\": \"" + repName + "\",\n" +
+                        "  \"description\": \"This is your first repository\",\n" +
+                        "  \"auto_init\" : true \n" +
+                        "}";
+        given()
+                .auth().preemptive().basic(username, pass)
+                .when()
+                .contentType("application/json; charset=UTF-8")
+                .body(json)
+                .post("https://api.github.com/user/repos");
+        SetUP();
+        open(BASE_URL + "/login");
+        login(username, pass);
+        sleep(3000);
+        $("#dashboard-repos-filter").val(username + "/" + repName);
+        $(".list-style-none .width-full").click();
+        $(".reponav .octicon-gear").click();
+        $(".btn-danger", 4).click();
+        $(".input-block", 1).val(repName).pressEnter();
+
+         sleep(5000);
     }
 }
